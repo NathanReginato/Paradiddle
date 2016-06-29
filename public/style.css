@@ -17,9 +17,19 @@ nav {
   justify-content: center;
 }
 .start a {
-  font-size: 70px;
-  background: red;
+  font-size: 50px;
+  background: green;
   text-align: center;
+  text-decoration: none;
+  color: white;
+  padding: 10px;
+  border-radius: 5px;
+}
+
+.start a:hover, .start a:active, .start a:visited {
+  background: green;
+  text-decoration: none;
+  color: white;
 }
 
 .start .button {

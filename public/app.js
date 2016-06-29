@@ -241,6 +241,8 @@ navigator.getUserMedia = (navigator.getUserMedia ||
 
   function countOff() {
 
+    let countDown = beats
+    let countPrev = false
     //Set up buffer array for input data
     analyser.fftSize = 1024;
     let bufferLength = analyser.frequencyBinCount;
@@ -275,8 +277,16 @@ navigator.getUserMedia = (navigator.getUserMedia ||
           }
         }
 
+
+        if (countPrev === false && sound === true) {
+          myBtn.innerHTML = countDown
+          countDown--
+        }
+        countPrev = sound
+
         requestAnimationFrame(iterator);
       } else {
+        myBtn.innerHTML = 'Start'
         count = spaced_bars / 2;
         loop()
       }
@@ -291,6 +301,7 @@ navigator.getUserMedia = (navigator.getUserMedia ||
   myBtn.addEventListener('click', function(event) {
     countOff()
   });
+
 
   // sample()
   //Draw metronome bars and sound waves
