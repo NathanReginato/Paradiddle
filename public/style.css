@@ -1,0 +1,27 @@
+h2 {
+  padding: 0;
+  margin: 12px 0 0 0;
+}
+
+nav {
+  height: 60px;
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  background: green;
+  margin: 0 0 20px 0;
+}
+
+.start {
+  display: flex;
+  justify-content: center;
+}
+.start a {
+  font-size: 70px;
+  background: red;
+  text-align: center;
+}
+
+.start .button {
+
+}
