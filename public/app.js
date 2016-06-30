@@ -137,6 +137,7 @@ navigator.getUserMedia = (navigator.getUserMedia ||
     let destCtx = dest.getContext('2d');
     dest.setAttribute('width',intendedWidth);
     dest.setAttribute('height',HEIGHT);
+    destCtx.clearRect(0, 0, WIDTH, HEIGHT);
     destCtx.drawImage(canvas, 0, 0);
     canvasCount++
   }
@@ -193,6 +194,7 @@ navigator.getUserMedia = (navigator.getUserMedia ||
           canvasCtx.clearRect(0, 0, WIDTH, HEIGHT);
           count = spaced_bars / 2
           $scope.bars = 2
+          canvasCount = 1;
           //Some finishing function
         }
       }
@@ -332,6 +334,7 @@ navigator.getUserMedia = (navigator.getUserMedia ||
 
   //add event listener
   myBtn.addEventListener('click', function(event) {
+    container.innerHTML = '';
     countOff()
   });
 
