@@ -16,9 +16,11 @@ navigator.getUserMedia = (navigator.getUserMedia ||
   const canvas = document.getElementById('canvas');
   const canvasCtx = canvas.getContext("2d");
 
+
   let intendedWidth = document.querySelector('body').clientWidth;
 
   canvas.setAttribute('width',intendedWidth);
+
 
   //Set up oscillator
   const oscillator = audioCtx.createOscillator();
@@ -121,6 +123,24 @@ navigator.getUserMedia = (navigator.getUserMedia ||
     console.log('getUserMedia not supported on your browser!');
   }
 
+
+  //Set up catch for past canvas
+  const container = document.getElementById('containers')
+  let canvasCount = 1;
+
+  function copyCanvas() {
+    var temp = document.createElement("canvas");
+    temp.setAttribute("id", "dest" + canvasCount);
+    container.appendChild(temp);
+
+    let dest = document.getElementById("dest" + canvasCount);
+    let destCtx = dest.getContext('2d');
+    dest.setAttribute('width',intendedWidth);
+    dest.setAttribute('height',HEIGHT);
+    destCtx.drawImage(canvas, 0, 0);
+    canvasCount++
+  }
+
   //Set up animation loop
   function loop() {
 
@@ -161,9 +181,9 @@ navigator.getUserMedia = (navigator.getUserMedia ||
             gainNode.gain.value = 0
           }
         }
-        console.log(dataArray);
         requestAnimationFrame(iterator);
       } else {
+        copyCanvas()
         if ($scope.bars > 1) {
           canvasCtx.clearRect(0, 0, WIDTH, HEIGHT);
           count = spaced_bars / 2
