@@ -1,5 +1,7 @@
 //Set up consts
 
+angular.module('paradiddle', [])
+.controller('main', function($scope) {
 //Get audio context
 const AudioContext = window.AudioContext || window.webkitAudioContext;
 const audioCtx = new AudioContext();
@@ -45,12 +47,14 @@ navigator.getUserMedia = (navigator.getUserMedia ||
   let WIDTH = canvas.width
 
   //Set up view varibales
+  $scope.bars = 2;
+  $scope.volume = 0.1;
+  $scope.beats = 4
   let beats = 4
-  let bars = 2
   let divided_beats = beats + 1
   let spaced_bars = WIDTH / divided_beats
   let wave_pixel = 0.3
-  let canvas_slicer = 0.009
+  let canvas_slicer = 0.025
   let bar_y = 0;
   let b_width = 1;
   let sound = false;
@@ -99,7 +103,7 @@ navigator.getUserMedia = (navigator.getUserMedia ||
 
       //start oscillator set properties
       oscillator.start(0);
-      oscillator.frequency.value = 220
+      oscillator.frequency.value = 440
     }
 
     // Error callback
@@ -136,6 +140,7 @@ navigator.getUserMedia = (navigator.getUserMedia ||
           canvasCtx.fillRect(count,dataArray[i],wave_pixel,wave_pixel)
           count += canvas_slicer
 
+
           for (var j = 1; j < divided_beats; j++) {
             if (count > (spaced_bars * j) && count < (spaced_bars * j) + 90) {
               sound = true
@@ -146,18 +151,18 @@ navigator.getUserMedia = (navigator.getUserMedia ||
           }
 
           if (sound) {
-            gainNode.gain.value = 0.1
+            gainNode.gain.value = $scope.volume
           } else {
             gainNode.gain.value = 0
           }
         }
-
+        console.log(dataArray);
         requestAnimationFrame(iterator);
       } else {
-        if (bars > 1) {
+        if ($scope.bars > 1) {
           canvasCtx.clearRect(0, 0, WIDTH, HEIGHT);
           count = spaced_bars / 2
-          bars--
+          $scope.bars--
           loop()
         } else {
           //Some finishing function
@@ -213,7 +218,7 @@ navigator.getUserMedia = (navigator.getUserMedia ||
           }
 
           if (sound) {
-            gainNode.gain.value = 0.1
+            gainNode.gain.value = $scope.volume
           } else {
             gainNode.gain.value = 0
           }
@@ -271,7 +276,7 @@ navigator.getUserMedia = (navigator.getUserMedia ||
           }
 
           if (sound) {
-            gainNode.gain.value = 0.1
+            gainNode.gain.value = $scope.volume
           } else {
             gainNode.gain.value = 0
           }
@@ -301,6 +306,10 @@ navigator.getUserMedia = (navigator.getUserMedia ||
   myBtn.addEventListener('click', function(event) {
     countOff()
   });
+
+
+
+  })
 
 
   // sample()
