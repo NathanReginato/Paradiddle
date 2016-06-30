@@ -54,7 +54,7 @@ navigator.getUserMedia = (navigator.getUserMedia ||
   let divided_beats = beats + 1
   let spaced_bars = WIDTH / divided_beats
   let wave_pixel = 0.3
-  let canvas_slicer = 0.025
+  let canvas_slicer = 0.02
   let bar_y = 0;
   let b_width = 1;
   let sound = false;
@@ -62,6 +62,11 @@ navigator.getUserMedia = (navigator.getUserMedia ||
   let end = WIDTH - spaced_bars / 2
 
   //Set up audio input
+  $scope.showit = false
+  //Settings
+  $scope.showsettings = function() {
+    $scope.showit = !$scope.showit
+  }
 
   //Check if getUserMedia is supported
   if (navigator.getUserMedia) {
