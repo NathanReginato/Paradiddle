@@ -34,6 +34,7 @@ nav {
   justify-content: center;
 }
 .start a {
+  width: 160px;
   font-size: 50px;
   background: #749C75;
   text-align: center;

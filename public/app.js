@@ -170,6 +170,9 @@ navigator.getUserMedia = (navigator.getUserMedia ||
           $scope.bars--
           loop()
         } else {
+          canvasCtx.clearRect(0, 0, WIDTH, HEIGHT);
+          count = spaced_bars / 2
+          $scope.bars = 2
           //Some finishing function
         }
       }
