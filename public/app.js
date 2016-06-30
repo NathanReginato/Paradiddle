@@ -321,7 +321,7 @@ navigator.getUserMedia = (navigator.getUserMedia ||
 
         requestAnimationFrame(iterator);
       } else {
-        myBtn.innerHTML = 'Start'
+        myBtn.innerHTML = 'START'
         count = spaced_bars / 2;
         loop()
       }

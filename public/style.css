@@ -34,7 +34,7 @@ nav {
   justify-content: center;
 }
 .start a {
-  width: 160px;
+  width: 180px;
   font-size: 50px;
   background: #749C75;
   text-align: center;
@@ -69,6 +69,7 @@ nav {
   top:0;
   left: 12px;
   transition: all 0.2s;
+  color: #44292A;
 }
 
 .ion-gear-a:hover {
@@ -86,9 +87,12 @@ nav {
   border: 10px solid #749C75;
   box-shadow: 0 10px 10px rgba(68,41,42,0.5);
   background: #F4F6EF;
+  padding: 15px;
 }
 
 .options h3 {
+  padding: 0;
+  margin: 0;
   font-weight: bold;
   font-family: 'Open Sans', sans-serif;
   color: #44292A;
