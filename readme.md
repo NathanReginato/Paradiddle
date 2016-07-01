@@ -11,7 +11,7 @@ Paradiddle takes real time data from your browser and writes it to a graph. "Per
 
 ### What is a paradiddle?
 
-Just in case you didn't know, [<i>"it is an absolutely essential rudiment for any drummer that wants to expand their drumming possibilities. The single paradiddle is a combination of single strokes and double strokes."](http://www.freedrumlessons.com/drum-lessons/single-paradiddle.php) 
+Just in case you didn't know, [<i>"it is an absolutely essential rudiment for any drummer that wants to expand their drumming possibilities. The single paradiddle is a combination of single strokes and double strokes."</i>](http://www.freedrumlessons.com/drum-lessons/single-paradiddle.php) 
 
 ### About me
 
