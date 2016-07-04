@@ -134,212 +134,209 @@ angular.module('paradiddle', [])
     $scope.bars = 4;
     $scope.volume = 0.1;
     $scope.beats = 6;
-    $scope.tempo = 0.09
+    $scope.tempo = 0.01
 
     function initialization() {
 
-    let divided_beats = $scope.beats + 1
-    let spaced_bars = WIDTH / divided_beats
-    let wave_pixel = 1
-    let canvas_slicer = $scope.tempo
-    let bar_y = 0;
-    let b_width = 1;
-    let sound = false;
-    let count = spaced_bars / 2
-    let end = WIDTH - spaced_bars / 2
+      let divided_beats = $scope.beats + 1
+      let spaced_bars = WIDTH / divided_beats
+      let wave_pixel = 1
+      let canvas_slicer = $scope.tempo
+      let bar_y = 0;
+      let b_width = 1;
+      let sound = false;
+      let count = spaced_bars / 2
+      let end = WIDTH - spaced_bars / 2
 
-    countOff()
-
-
-    //Set up animation loop
-    function loop() {
-
-      let lag = 10;
-      let diff = 10;
-      let influence = 0;
-      let meanArray = [];
-      let mean = HEIGHT / 2
-      let savedPlot;
-      let first = true
-      let meanLength = 40
-      let peakArray = []
-      let lastQualifyingPoint = null
-      let down = false
-      let peaksArray = []
-      //Set up buffer array for input data
-      analyser.fftSize = 1024;
-      let bufferLength = analyser.frequencyBinCount;
-      let dataArray = new Uint8Array(bufferLength);
+      countOff()
 
 
+      //Set up animation loop
+      function loop() {
 
-      for (var i = 1; i < divided_beats; i++) {
-        canvasCtx.fillRect(spaced_bars * i, bar_y, b_width, HEIGHT)
-      }
-      //Set up iterator function
-      function iterator() {
-
-        if (count < end) {
-
-          analyser.getByteTimeDomainData(dataArray);
-
-          for (let i = 1; i < bufferLength; i++) {
-
-
-            //Only let one peak be drawn per bar
+        let lag = 10;
+        let diff = 30;
+        let influence = 0;
+        let meanArray = [];
+        let mean = HEIGHT / 2
+        let savedPlot;
+        let first = true
+        let meanLength = 100
+        let peakArray = []
+        let lastQualifyingPoint = null
+        let down = false
+        let peaksArray = []
+        let peaksAverageArray = []
+        let peakAverage = 0;
+        //Set up buffer array for input data
+        analyser.fftSize = 1024;
+        let bufferLength = analyser.frequencyBinCount;
+        let dataArray = new Uint8Array(bufferLength);
 
 
 
-            //Peak analyser
-            //Signal when plot point goes above mean + diff
-            if (dataArray[i] < mean - diff) {
-              if (lastQualifyingPoint) {
-                if (dataArray[i] < lastQualifyingPoint[1]) {
-                  lastQualifyingPoint = [count, dataArray[i]];
-                  down = false
-                } else {
-                  if (!down) {
+        for (var i = 1; i < divided_beats; i++) {
+          canvasCtx.fillRect(spaced_bars * i, bar_y, b_width, HEIGHT)
+        }
+        //Set up iterator function
+        function iterator() {
+
+          if (count < end) {
+
+            analyser.getByteTimeDomainData(dataArray);
+
+            for (let i = 1; i < bufferLength; i++) {
+
+              if (dataArray[i] < mean - diff) {
+
+
+                if (lastQualifyingPoint) {
+                  if (dataArray[i] < lastQualifyingPoint[1]) {
+                    lastQualifyingPoint = [count, dataArray[i]];
+                  } else {
+
                     peakArray.push([count, dataArray[i]])
 
                     if (peakArray.length > 1) {
+                      canvasCtx.fillStyle = 'green';
                       canvasCtx.fillRect(peakArray[0][0],0,1,HEIGHT)
-                      
+                      canvasCtx.fillStyle = 'black';
                     }
                     canvasCtx.fillStyle = 'blue';
                     canvasCtx.fillRect(lastQualifyingPoint[0],0,1,HEIGHT)
-                    canvasCtx.fillRect(lastQualifyingPoint[0],lastQualifyingPoint[1],1,1)
+                    canvasCtx.fillRect(lastQualifyingPoint[0],lastQualifyingPoint[1],20,1)
                     canvasCtx.fillStyle = 'black';
                     lastQualifyingPoint = [count, dataArray[i]];
-                    down = true
+
+
                   }
+                } else {
+                  lastQualifyingPoint = [count, dataArray[i]]
                 }
+
+
               } else {
-                lastQualifyingPoint = [count, dataArray[i]]
+                if (dataArray[i] < HEIGHT / 2) {
+                  meanArray.unshift(dataArray[i])
+
+                  canvasCtx.fillStyle = 'red';
+                  canvasCtx.fillRect(count,mean,1,1)
+
+                  canvasCtx.fillStyle = 'black';
+                }
+
+                if (meanArray.length > meanLength) {
+                  meanArray.pop()
+                }
+
+                let meanSum = 0;
+
+                for (var j = 0; j < meanArray.length; j++) {
+                  meanSum += meanArray[j]
+                }
+
+                mean = meanSum / meanArray.length
               }
 
+              //Boring stuff
 
-            } else {
-              if (dataArray[i] < HEIGHT / 2) {
-                meanArray.unshift(dataArray[i])
 
-                canvasCtx.fillStyle = 'red';
-                canvasCtx.fillRect(count,mean,1,1)
+              canvasCtx.fillRect(count,dataArray[i],wave_pixel,wave_pixel)
+              count += canvas_slicer
 
-                canvasCtx.fillStyle = 'black';
+
+              for (var j = 1; j < divided_beats; j++) {
+                if (count > (spaced_bars * j) && count < (spaced_bars * j) + spaced_bars / 2) {
+                  sound = true
+                  break
+                } else {
+                  sound  = false
+                }
               }
 
-              if (meanArray.length > meanLength) {
-                meanArray.pop()
-              }
-
-              let meanSum = 0;
-
-              for (var j = 0; j < meanArray.length; j++) {
-                meanSum += meanArray[j]
-              }
-
-              mean = meanSum / meanArray.length
-            }
-
-            //Boring stuff
-
-
-            canvasCtx.fillRect(count,dataArray[i],wave_pixel,wave_pixel)
-            count += canvas_slicer
-
-
-            for (var j = 1; j < divided_beats; j++) {
-              if (count > (spaced_bars * j) && count < (spaced_bars * j) + spaced_bars / 2) {
-                sound = true
-                break
+              if (sound) {
+                gainNode.gain.value = $scope.volume
               } else {
-                sound  = false
+                gainNode.gain.value = 0
               }
             }
 
-            if (sound) {
-              gainNode.gain.value = $scope.volume
-            } else {
-              gainNode.gain.value = 0
-            }
-          }
 
-
-          requestAnimationFrame(iterator);
-        } else {
-          copyCanvas()
-          if ($scope.bars > 1) {
-            canvasCtx.clearRect(0, 0, WIDTH, HEIGHT);
-            count = spaced_bars / 2
-            $scope.bars--
-            loop()
+            requestAnimationFrame(iterator);
           } else {
-            canvasCtx.clearRect(0, 0, WIDTH, HEIGHT);
-            count = spaced_bars / 2
-            $scope.bars = 2
-            canvasCount = 1;
-            //Some finishing function
+            copyCanvas()
+            if ($scope.bars > 1) {
+              canvasCtx.clearRect(0, 0, WIDTH, HEIGHT);
+              count = spaced_bars / 2
+              $scope.bars--
+              loop()
+            } else {
+              canvasCtx.clearRect(0, 0, WIDTH, HEIGHT);
+              count = spaced_bars / 2
+              $scope.bars = 2
+              canvasCount = 1;
+              //Some finishing function
+            }
           }
         }
+        iterator()
       }
-      iterator()
-    }
 
-    function countOff() {
+      function countOff() {
 
-      let countDown = $scope.beats
-      let countPrev = false
-      //Set up buffer array for input data
-      analyser.fftSize = 1024;
-      let bufferLength = analyser.frequencyBinCount;
-      let dataArray = new Uint8Array(bufferLength);
+        let countDown = $scope.beats
+        let countPrev = false
+        //Set up buffer array for input data
+        analyser.fftSize = 1024;
+        let bufferLength = analyser.frequencyBinCount;
+        let dataArray = new Uint8Array(bufferLength);
 
-      for (var i = 1; i < divided_beats; i++) {
-        canvasCtx.fillRect(spaced_bars * i, bar_y, b_width, HEIGHT)
-      }
-      //Set up iterator function
-      function iterator() {
+        for (var i = 1; i < divided_beats; i++) {
+          canvasCtx.fillRect(spaced_bars * i, bar_y, b_width, HEIGHT)
+        }
+        //Set up iterator function
+        function iterator() {
 
-        if (count < end) {
+          if (count < end) {
 
-          analyser.getByteTimeDomainData(dataArray);
+            analyser.getByteTimeDomainData(dataArray);
 
-          for (let i = 0; i < bufferLength; i++) {
-            count += canvas_slicer
+            for (let i = 0; i < bufferLength; i++) {
+              count += canvas_slicer
 
-            for (var j = 1; j < divided_beats; j++) {
-              if (count > (spaced_bars * j) && count < (spaced_bars * j) + spaced_bars / 2) {
-                sound = true
-                break
+              for (var j = 1; j < divided_beats; j++) {
+                if (count > (spaced_bars * j) && count < (spaced_bars * j) + spaced_bars / 2) {
+                  sound = true
+                  break
+                } else {
+                  sound  = false
+                }
+              }
+
+              if (sound) {
+                gainNode.gain.value = $scope.volume
               } else {
-                sound  = false
+                gainNode.gain.value = 0
               }
             }
 
-            if (sound) {
-              gainNode.gain.value = $scope.volume
-            } else {
-              gainNode.gain.value = 0
+
+            if (countPrev === false && sound === true) {
+              myBtn.innerHTML = countDown
+              countDown--
             }
+            countPrev = sound
+
+            requestAnimationFrame(iterator);
+          } else {
+            myBtn.innerHTML = 'START'
+            count = spaced_bars / 2;
+            loop()
           }
-
-
-          if (countPrev === false && sound === true) {
-            myBtn.innerHTML = countDown
-            countDown--
-          }
-          countPrev = sound
-
-          requestAnimationFrame(iterator);
-        } else {
-          myBtn.innerHTML = 'START'
-          count = spaced_bars / 2;
-          loop()
         }
+        iterator()
       }
-      iterator()
     }
-}
 
     var myBtn = document.getElementById('start');
 
