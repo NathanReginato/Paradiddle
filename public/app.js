@@ -178,18 +178,17 @@ angular.module('paradiddle', [])
 
             //Only let one peak be drawn per bar
 
-            let lastQualifyingPoint = 0;
+            let lastQualifyingPoint = 0
             //Peak analyser
             //Signal when plot point goes above mean + diff
             if (dataArray[i] < mean - diff) {
-
-              if (dataArray[i] > lastQualifyingPoint) {
-
+              if (lastQualifyingPoint < dataArray[i]) {
                 canvasCtx.fillStyle = 'blue';
-                canvasCtx.fillRect(lastQualifyingPoint,0,1,HEIGHT)
+                canvasCtx.fillRect(count,lastQualifyingPoint,1,10)
                 canvasCtx.fillStyle = 'black';
+                lastQualifyingPoint = dataArray[i]
               } else {
-                lastQualifyingPoint = count
+
                 canvasCtx.fillRect(count,dataArray[i],1,1)
               }
 
