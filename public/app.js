@@ -148,6 +148,11 @@ angular.module('paradiddle', [])
       let count = spaced_bars / 2
       let end = WIDTH - spaced_bars / 2
 
+      let plotDistance = 0;
+      let plotsArray = [];
+      let distancesArray = [];
+      let distanceSum = 0;
+
       countOff()
 
 
@@ -181,18 +186,16 @@ angular.module('paradiddle', [])
 
               if (dataArray[i] < mean - diff) {
 
-
                 canvasCtx.fillStyle = '#749C75';
                 canvasCtx.fillRect(count,dataArray[i],20,1)
                 canvasCtx.fillStyle = '#44292A';
                 lastQualifyingPoint = [count, dataArray[i]];
 
-
               } else {
                 if (dataArray[i] < HEIGHT / 2) {
                   meanArray.unshift(dataArray[i])
 
-                  canvasCtx.fillStyle = 'red';
+                  canvasCtx.fillStyle = 'purple';
                   canvasCtx.fillRect(count,mean,1,1)
 
                   canvasCtx.fillStyle = '#44292A';
