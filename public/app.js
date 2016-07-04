@@ -155,13 +155,13 @@ angular.module('paradiddle', [])
       function loop() {
 
         let lag = 10;
-        let diff = 30;
+        let diff = 40;
         let influence = 0;
         let meanArray = [];
         let mean = HEIGHT / 2
         let savedPlot;
         let first = true
-        let meanLength = 100
+        let meanLength = 40
         let peakArray = []
         let lastQualifyingPoint = null
         let down = false
@@ -176,6 +176,7 @@ angular.module('paradiddle', [])
 
 
         for (var i = 1; i < divided_beats; i++) {
+          canvasCtx.fillStyle = '#44292A';
           canvasCtx.fillRect(spaced_bars * i, bar_y, b_width, HEIGHT)
         }
         //Set up iterator function
@@ -190,29 +191,10 @@ angular.module('paradiddle', [])
               if (dataArray[i] < mean - diff) {
 
 
-                if (lastQualifyingPoint) {
-                  if (dataArray[i] < lastQualifyingPoint[1]) {
-                    lastQualifyingPoint = [count, dataArray[i]];
-                  } else {
-
-                    peakArray.push([count, dataArray[i]])
-
-                    if (peakArray.length > 1) {
-                      canvasCtx.fillStyle = 'green';
-                      canvasCtx.fillRect(peakArray[0][0],0,1,HEIGHT)
-                      canvasCtx.fillStyle = 'black';
-                    }
-                    canvasCtx.fillStyle = 'blue';
-                    canvasCtx.fillRect(lastQualifyingPoint[0],0,1,HEIGHT)
-                    canvasCtx.fillRect(lastQualifyingPoint[0],lastQualifyingPoint[1],20,1)
-                    canvasCtx.fillStyle = 'black';
-                    lastQualifyingPoint = [count, dataArray[i]];
-
-
-                  }
-                } else {
-                  lastQualifyingPoint = [count, dataArray[i]]
-                }
+                canvasCtx.fillStyle = '#749C75';
+                canvasCtx.fillRect(count,dataArray[i],20,1)
+                canvasCtx.fillStyle = '#44292A';
+                lastQualifyingPoint = [count, dataArray[i]];
 
 
               } else {
@@ -222,7 +204,7 @@ angular.module('paradiddle', [])
                   canvasCtx.fillStyle = 'red';
                   canvasCtx.fillRect(count,mean,1,1)
 
-                  canvasCtx.fillStyle = 'black';
+                  canvasCtx.fillStyle = '#44292A';
                 }
 
                 if (meanArray.length > meanLength) {
@@ -292,6 +274,7 @@ angular.module('paradiddle', [])
         let dataArray = new Uint8Array(bufferLength);
 
         for (var i = 1; i < divided_beats; i++) {
+          canvasCtx.fillStyle = '#44292A';
           canvasCtx.fillRect(spaced_bars * i, bar_y, b_width, HEIGHT)
         }
         //Set up iterator function
