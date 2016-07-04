@@ -131,7 +131,7 @@ angular.module('paradiddle', [])
     }
 
     //Set up view varibales
-    $scope.bars = 4;
+    $scope.bars = 2;
     $scope.volume = 0.1;
     $scope.beats = 6;
     $scope.tempo = 0.01
@@ -153,16 +153,17 @@ angular.module('paradiddle', [])
       let distancesArray = [];
       let distanceSum = 0;
 
+      let diff = 40;
+      let meanArray = [];
+      let meanLength = 40
+      let mean = HEIGHT / 2
+
       countOff()
 
 
       //Set up animation loop
       function loop() {
 
-        let diff = 40;
-        let meanArray = [];
-        let meanLength = 40
-        let mean = HEIGHT / 2
 
 
         analyser.fftSize = 1024;
@@ -186,12 +187,24 @@ angular.module('paradiddle', [])
 
               if (dataArray[i] < mean - diff) {
 
-                canvasCtx.fillStyle = '#749C75';
-                canvasCtx.fillRect(count,dataArray[i],20,1)
-                canvasCtx.fillStyle = '#44292A';
-                lastQualifyingPoint = [count, dataArray[i]];
+                plotsArray.push(count)
+
+                for (var j = 1; j < plotsArray.length; j++) {
+                  distancesArray.push(Math.abs(plotsArray[j] - plotsArray[j-1]))
+                }
+
+                for (var j = 0; j < distancesArray.length; j++) {
+                  distanceSum += distancesArray[j]
+                }
+
+                plotDistance = distanceSum / distancesArray.length
+
+
 
               } else {
+
+
+
                 if (dataArray[i] < HEIGHT / 2) {
                   meanArray.unshift(dataArray[i])
 
@@ -214,8 +227,6 @@ angular.module('paradiddle', [])
                 mean = meanSum / meanArray.length
               }
 
-              //Boring stuff
-
 
               canvasCtx.fillRect(count,dataArray[i],wave_pixel,wave_pixel)
               count += canvas_slicer
@@ -236,6 +247,19 @@ angular.module('paradiddle', [])
                 gainNode.gain.value = 0
               }
             }
+
+            if (count > plotsArray[plotsArray.length - 1] + plotDistance * 10 && plotDistance != 0) {
+              canvasCtx.fillStyle = '#749C75';
+              canvasCtx.fillRect(plotsArray[0],0,1,HEIGHT)
+              canvasCtx.fillStyle = '#44292A';
+              plotDistance = 0;
+              plotsArray = [];
+              distancesArray = [];
+              distanceSum = 0;
+
+            }
+
+            console.log(plotDistance);
 
             requestAnimationFrame(iterator);
           } else {
