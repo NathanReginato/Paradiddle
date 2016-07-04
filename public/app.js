@@ -156,6 +156,7 @@ angular.module('paradiddle', [])
       let first = true
       let meanLength = 1000
       let peakArray = []
+      let lastQualifyingPoint = 0
       //Set up buffer array for input data
       analyser.fftSize = 1024;
       let bufferLength = analyser.frequencyBinCount;
@@ -178,17 +179,16 @@ angular.module('paradiddle', [])
 
             //Only let one peak be drawn per bar
 
-            let lastQualifyingPoint = 0
             //Peak analyser
             //Signal when plot point goes above mean + diff
             if (dataArray[i] < mean - diff) {
-              if (lastQualifyingPoint < dataArray[i]) {
+              if (lastQualifyingPoint > dataArray[i]) {
                 canvasCtx.fillStyle = 'blue';
-                canvasCtx.fillRect(count,lastQualifyingPoint,1,10)
+                canvasCtx.fillRect(count,lastQualifyingPoint,1,20)
                 canvasCtx.fillStyle = 'black';
-                lastQualifyingPoint = dataArray[i]
-              } else {
 
+              } else {
+                lastQualifyingPoint = dataArray[i]
                 canvasCtx.fillRect(count,dataArray[i],1,1)
               }
 
