@@ -149,6 +149,7 @@ angular.module('paradiddle', [])
       let end = WIDTH - spaced_bars / 2
       let waveWindow = 12
       let plotsArray = [];
+      let accuracy = 0;
 
 
       let diff = 40;
@@ -188,10 +189,13 @@ angular.module('paradiddle', [])
                 plotsArray.push(count)
 
               } else {
-                if (count > plotsArray[plotsArray.length - 1] + waveWindow) {
-                  canvasCtx.fillStyle = '#749C75';
-                  canvasCtx.fillRect(plotsArray[0],0,1,HEIGHT)
-                  canvasCtx.fillStyle = '#44292A';
+                if (plotsArray[plotsArray.length - 1] + waveWindow < WIDTH) {
+                  if (count > plotsArray[plotsArray.length - 1] + waveWindow) {
+                    canvasCtx.fillStyle = '#749C75';
+                    canvasCtx.fillRect(plotsArray[0],0,1,HEIGHT)
+                    canvasCtx.fillStyle = '#44292A';
+                    plotsArray = [];
+                  }
                   plotsArray = [];
                 }
 
