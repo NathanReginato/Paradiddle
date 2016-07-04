@@ -147,11 +147,9 @@ angular.module('paradiddle', [])
       let sound = false;
       let count = spaced_bars / 2
       let end = WIDTH - spaced_bars / 2
-
-      let plotDistance = 0;
+      let waveWidthGive = 10
       let plotsArray = [];
-      let distancesArray = [];
-      let distanceSum = 0;
+
 
       let diff = 40;
       let meanArray = [];
@@ -189,21 +187,13 @@ angular.module('paradiddle', [])
 
                 plotsArray.push(count)
 
-                for (var j = 1; j < plotsArray.length; j++) {
-                  distancesArray.push(Math.abs(plotsArray[j] - plotsArray[j-1]))
-                }
-
-                for (var j = 0; j < distancesArray.length; j++) {
-                  distanceSum += distancesArray[j]
-                }
-
-                plotDistance = distanceSum / distancesArray.length
-
-
-
               } else {
-
-
+                if (count > plotsArray[plotsArray.length - 1] + waveWidthGive) {
+                  canvasCtx.fillStyle = '#749C75';
+                  canvasCtx.fillRect(plotsArray[0],0,1,HEIGHT)
+                  canvasCtx.fillStyle = '#44292A';
+                  plotsArray = [];
+                }
 
                 if (dataArray[i] < HEIGHT / 2) {
                   meanArray.unshift(dataArray[i])
@@ -247,19 +237,6 @@ angular.module('paradiddle', [])
                 gainNode.gain.value = 0
               }
             }
-
-            if (count > plotsArray[plotsArray.length - 1] + plotDistance * 10 && plotDistance != 0) {
-              canvasCtx.fillStyle = '#749C75';
-              canvasCtx.fillRect(plotsArray[0],0,1,HEIGHT)
-              canvasCtx.fillStyle = '#44292A';
-              plotDistance = 0;
-              plotsArray = [];
-              distancesArray = [];
-              distanceSum = 0;
-
-            }
-
-            console.log(plotDistance);
 
             requestAnimationFrame(iterator);
           } else {
