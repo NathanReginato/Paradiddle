@@ -58,7 +58,16 @@ nav {
 }
 
 .row {
-  width: 100%
+  width: 100%;
+  margin: 0;
+}
+
+.screen {
+  position: fixed;
+  top: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.3);
 }
 
 .ion-gear-a {

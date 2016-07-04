@@ -23,13 +23,26 @@
     </div>
   </main>
   <div class="setting-container" ng-show="showit">
+    <div class="screen" ng-click="showit=!showit"></div>
     <div class="row">
       <div class="options col-md-offset-3 col-md-6">
         <h1>SETTINGS</h1>
         <label for="">Volume</label>
         <input class="volume" type="range" value="0.1" ng-model="volume" min="0" max="2" step="0.1">
-        <label for="">Bars</label><br>
-        <input class="bars" type="number" ng-model="bars">
+        <div class="row">
+          <div class="col-md-4">
+            <label for="">Bars</label><br>
+            <input class="bars" type="number" ng-model="bars">
+          </div>
+          <div class="col-md-4">
+            <label for="">Beats per measure</label><br>
+            <input class="bars" type="number" ng-model="beats">
+          </div>
+          <div class="col-md-4">
+            <label for="">Tempo</label><br>
+            <input class="bars" type="number" ng-model="tempo">
+          </div>
+        </div>
       </div>
     </div>
   </div>

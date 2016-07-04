@@ -48,22 +48,9 @@ angular.module('paradiddle', [])
     let HEIGHT = canvas.height
     let WIDTH = canvas.width
 
-    //Set up view varibales
-    $scope.bars = 10;
-    $scope.volume = 0.1;
-    $scope.beats = 4
-    let beats = 4
-    let divided_beats = beats + 1
-    let spaced_bars = WIDTH / divided_beats
-    let wave_pixel = 0.3
-    let canvas_slicer = 0.1
-    let bar_y = 0;
-    let b_width = 1;
-    let sound = false;
-    let count = spaced_bars / 2
-    let end = WIDTH - spaced_bars / 2
 
     //Set up audio input
+
     $scope.showit = false
     //Settings
     $scope.showsettings = function() {
@@ -142,6 +129,28 @@ angular.module('paradiddle', [])
       canvasCount++
     }
 
+    //Set up view varibales
+    $scope.bars = 10;
+    $scope.volume = 0.1;
+    $scope.beats = 32;
+    $scope.tempo = 0.09
+
+    function initialization() {
+
+
+
+    let divided_beats = $scope.beats + 1
+    let spaced_bars = WIDTH / divided_beats
+    let wave_pixel = 0.3
+    let canvas_slicer = $scope.tempo
+    let bar_y = 0;
+    let b_width = 1;
+    let sound = false;
+    let count = spaced_bars / 2
+    let end = WIDTH - spaced_bars / 2
+
+      countOff()
+
 
     //Set up animation loop
     function loop() {
@@ -149,7 +158,6 @@ angular.module('paradiddle', [])
       let lag = 10;
       let diff = 20;
       let influence = 0;
-      let direction = 'both'
       let meanArray = [];
       let mean = HEIGHT / 2
       let savedPlot;
@@ -224,7 +232,7 @@ angular.module('paradiddle', [])
 
 
             for (var j = 1; j < divided_beats; j++) {
-              if (count > (spaced_bars * j) && count < (spaced_bars * j) + 90) {
+              if (count > (spaced_bars * j) && count < (spaced_bars * j) + spaced_bars / 2) {
                 sound = true
                 break
               } else {
@@ -260,7 +268,7 @@ angular.module('paradiddle', [])
 
     function countOff() {
 
-      let countDown = beats
+      let countDown = $scope.beats
       let countPrev = false
       //Set up buffer array for input data
       analyser.fftSize = 1024;
@@ -281,7 +289,7 @@ angular.module('paradiddle', [])
             count += canvas_slicer
 
             for (var j = 1; j < divided_beats; j++) {
-              if (count > (spaced_bars * j) && count < (spaced_bars * j) + 90) {
+              if (count > (spaced_bars * j) && count < (spaced_bars * j) + spaced_bars / 2) {
                 sound = true
                 break
               } else {
@@ -312,14 +320,14 @@ angular.module('paradiddle', [])
       }
       iterator()
     }
-
+}
 
     var myBtn = document.getElementById('start');
 
     //add event listener
     myBtn.addEventListener('click', function(event) {
       container.innerHTML = '';
-      countOff()
+      initialization()
     });
 
 
