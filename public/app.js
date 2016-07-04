@@ -154,21 +154,12 @@ angular.module('paradiddle', [])
       //Set up animation loop
       function loop() {
 
-        let lag = 10;
         let diff = 40;
-        let influence = 0;
         let meanArray = [];
-        let mean = HEIGHT / 2
-        let savedPlot;
-        let first = true
         let meanLength = 40
-        let peakArray = []
-        let lastQualifyingPoint = null
-        let down = false
-        let peaksArray = []
-        let peaksAverageArray = []
-        let peakAverage = 0;
-        //Set up buffer array for input data
+        let mean = HEIGHT / 2
+
+
         analyser.fftSize = 1024;
         let bufferLength = analyser.frequencyBinCount;
         let dataArray = new Uint8Array(bufferLength);
@@ -242,7 +233,6 @@ angular.module('paradiddle', [])
                 gainNode.gain.value = 0
               }
             }
-
 
             requestAnimationFrame(iterator);
           } else {
