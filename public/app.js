@@ -33,6 +33,7 @@ angular.module('paradiddle', [])
 
     //Set up analizer
     const analyser = audioCtx.createAnalyser();
+    analyser.fftSize = 32;
 
     //Set up other variables
     let source;
@@ -130,18 +131,16 @@ angular.module('paradiddle', [])
     }
 
     //Set up view varibales
-    $scope.bars = 10;
+    $scope.bars = 4;
     $scope.volume = 0.1;
-    $scope.beats = 32;
+    $scope.beats = 6;
     $scope.tempo = 0.09
 
     function initialization() {
 
-
-
     let divided_beats = $scope.beats + 1
     let spaced_bars = WIDTH / divided_beats
-    let wave_pixel = 0.3
+    let wave_pixel = 1
     let canvas_slicer = $scope.tempo
     let bar_y = 0;
     let b_width = 1;
@@ -149,22 +148,24 @@ angular.module('paradiddle', [])
     let count = spaced_bars / 2
     let end = WIDTH - spaced_bars / 2
 
-      countOff()
+    countOff()
 
 
     //Set up animation loop
     function loop() {
 
       let lag = 10;
-      let diff = 20;
+      let diff = 10;
       let influence = 0;
       let meanArray = [];
       let mean = HEIGHT / 2
       let savedPlot;
       let first = true
-      let meanLength = 1000
+      let meanLength = 40
       let peakArray = []
-      let lastQualifyingPoint = 0
+      let lastQualifyingPoint = null
+      let down = false
+      let peaksArray = []
       //Set up buffer array for input data
       analyser.fftSize = 1024;
       let bufferLength = analyser.frequencyBinCount;
@@ -187,17 +188,33 @@ angular.module('paradiddle', [])
 
             //Only let one peak be drawn per bar
 
+
+
             //Peak analyser
             //Signal when plot point goes above mean + diff
             if (dataArray[i] < mean - diff) {
-              if (lastQualifyingPoint > dataArray[i]) {
-                canvasCtx.fillStyle = 'blue';
-                canvasCtx.fillRect(count,lastQualifyingPoint,1,20)
-                canvasCtx.fillStyle = 'black';
+              if (lastQualifyingPoint) {
+                if (dataArray[i] < lastQualifyingPoint[1]) {
+                  lastQualifyingPoint = [count, dataArray[i]];
+                  down = false
+                } else {
+                  if (!down) {
+                    peakArray.push([count, dataArray[i]])
 
+                    if (peakArray.length > 1) {
+                      canvasCtx.fillRect(peakArray[0][0],0,1,HEIGHT)
+                      
+                    }
+                    canvasCtx.fillStyle = 'blue';
+                    canvasCtx.fillRect(lastQualifyingPoint[0],0,1,HEIGHT)
+                    canvasCtx.fillRect(lastQualifyingPoint[0],lastQualifyingPoint[1],1,1)
+                    canvasCtx.fillStyle = 'black';
+                    lastQualifyingPoint = [count, dataArray[i]];
+                    down = true
+                  }
+                }
               } else {
-                lastQualifyingPoint = dataArray[i]
-                canvasCtx.fillRect(count,dataArray[i],1,1)
+                lastQualifyingPoint = [count, dataArray[i]]
               }
 
 
@@ -246,6 +263,8 @@ angular.module('paradiddle', [])
               gainNode.gain.value = 0
             }
           }
+
+
           requestAnimationFrame(iterator);
         } else {
           copyCanvas()
@@ -333,11 +352,3 @@ angular.module('paradiddle', [])
 
 
   })
-
-
-  // sample()
-  //Draw metronome bars and sound waves
-  // canvasCtx.fillRect(10, 10, 10, 10);
-
-  //Draw bars
-  //draw waves
