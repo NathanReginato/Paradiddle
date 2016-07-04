@@ -147,7 +147,7 @@ angular.module('paradiddle', [])
       let sound = false;
       let count = spaced_bars / 2
       let end = WIDTH - spaced_bars / 2
-      let waveWidthGive = 10
+      let waveWindow = 12
       let plotsArray = [];
 
 
@@ -188,7 +188,7 @@ angular.module('paradiddle', [])
                 plotsArray.push(count)
 
               } else {
-                if (count > plotsArray[plotsArray.length - 1] + waveWidthGive) {
+                if (count > plotsArray[plotsArray.length - 1] + waveWindow) {
                   canvasCtx.fillStyle = '#749C75';
                   canvasCtx.fillRect(plotsArray[0],0,1,HEIGHT)
                   canvasCtx.fillStyle = '#44292A';
@@ -199,7 +199,7 @@ angular.module('paradiddle', [])
                   meanArray.unshift(dataArray[i])
 
                   canvasCtx.fillStyle = 'purple';
-                  canvasCtx.fillRect(count,mean,1,1)
+                  // canvasCtx.fillRect(count,mean,1,1)
 
                   canvasCtx.fillStyle = '#44292A';
                 }
@@ -218,7 +218,7 @@ angular.module('paradiddle', [])
               }
 
 
-              canvasCtx.fillRect(count,dataArray[i],wave_pixel,wave_pixel)
+              // canvasCtx.fillRect(count,dataArray[i],wave_pixel,wave_pixel)
               count += canvas_slicer
 
 
