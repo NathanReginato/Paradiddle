@@ -2,341 +2,326 @@
 
 angular.module('paradiddle', [])
 .controller('main', function($scope) {
-//Get audio context
-const AudioContext = window.AudioContext || window.webkitAudioContext;
-const audioCtx = new AudioContext();
+  //Get audio context
+  const AudioContext = window.AudioContext || window.webkitAudioContext;
+  const audioCtx = new AudioContext();
 
-//Get user media object
-navigator.getUserMedia = (navigator.getUserMedia ||
-  navigator.webkitGetUserMedia ||
-  navigator.mozGetUserMedia ||
-  navigator.msGetUserMedia);
+  //Get user media object
+  navigator.getUserMedia = (navigator.getUserMedia ||
+    navigator.webkitGetUserMedia ||
+    navigator.mozGetUserMedia ||
+    navigator.msGetUserMedia);
 
-  //Get animation context
-  const canvas = document.getElementById('canvas');
-  const canvasCtx = canvas.getContext("2d");
-
-
-  let intendedWidth = document.querySelector('body').clientWidth;
-
-  canvas.setAttribute('width',intendedWidth);
+    //Get animation context
+    const canvas = document.getElementById('canvas');
+    const canvasCtx = canvas.getContext("2d");
 
 
-  //Set up oscillator
-  const oscillator = audioCtx.createOscillator();
+    let intendedWidth = document.querySelector('body').clientWidth;
 
-  //Set up gain node
-  const gainNode = audioCtx.createGain();
-
-  //Set up silencer node
-  const silencer = audioCtx.createGain();
-
-  //Set up analizer
-  const analyser = audioCtx.createAnalyser();
-
-  //Set up other variables
-  let source;
-  let stream;
-
-  //Set browser frame rate
-  let cycles;
-
-  //Set smaple array
-  let sampleArray = []
-
-  //Set canvas varibles
-  let HEIGHT = canvas.height
-  let WIDTH = canvas.width
-
-  //Set up view varibales
-  $scope.bars = 2;
-  $scope.volume = 0.1;
-  $scope.beats = 4
-  let beats = 4
-  let divided_beats = beats + 1
-  let spaced_bars = WIDTH / divided_beats
-  let wave_pixel = 0.3
-  let canvas_slicer = 0.02
-  let bar_y = 0;
-  let b_width = 1;
-  let sound = false;
-  let count = spaced_bars / 2
-  let end = WIDTH - spaced_bars / 2
-
-  //Set up audio input
-  $scope.showit = false
-  //Settings
-  $scope.showsettings = function() {
-    $scope.showit = !$scope.showit
-  }
-
-  //Check if getUserMedia is supported
-  if (navigator.getUserMedia) {
-    console.log('getUserMedia supported.');
-
-    //If supported
-    navigator.getUserMedia ({audio: true}, streamCallback, errorCallback)
-
-    // Success callback
-    function streamCallback(stream) {
-      //Set up audio streams
-
-      //define audio stream
-      microphone = audioCtx.createMediaStreamSource(stream);
+    canvas.setAttribute('width',intendedWidth);
 
 
-      //Pipe 1
+    //Set up oscillator
+    const oscillator = audioCtx.createOscillator();
 
-      //Pipe user input to audio analyser
-      microphone.connect(analyser);
+    //Set up gain node
+    const gainNode = audioCtx.createGain();
 
-      //Pipe analyser to silencer
-      analyser.connect(silencer)
+    //Set up silencer node
+    const silencer = audioCtx.createGain();
 
-      //Pipe silencer to destination
-      silencer.connect(audioCtx.destination)
+    //Set up analizer
+    const analyser = audioCtx.createAnalyser();
 
-      //Pipe 2
+    //Set up other variables
+    let source;
+    let stream;
 
-      //Pipe oscillator to gain node
-      oscillator.connect(gainNode)
+    //Set browser frame rate
+    let cycles;
 
-      //Pipe gain to destination
-      gainNode.connect(audioCtx.destination);
+    //Set smaple array
+    let sampleArray = []
 
-      //set gain and silencer
-      gainNode.gain.value = 0;
-      silencer.gain.value = 0;
+    //Set canvas varibles
+    let HEIGHT = canvas.height
+    let WIDTH = canvas.width
 
-      //start oscillator set properties
-      oscillator.start(0);
-      oscillator.frequency.value = 440
+    //Set up view varibales
+    $scope.bars = 10;
+    $scope.volume = 0.1;
+    $scope.beats = 4
+    let beats = 4
+    let divided_beats = beats + 1
+    let spaced_bars = WIDTH / divided_beats
+    let wave_pixel = 0.3
+    let canvas_slicer = 0.1
+    let bar_y = 0;
+    let b_width = 1;
+    let sound = false;
+    let count = spaced_bars / 2
+    let end = WIDTH - spaced_bars / 2
+
+    //Set up audio input
+    $scope.showit = false
+    //Settings
+    $scope.showsettings = function() {
+      $scope.showit = !$scope.showit
     }
 
-    // Error callback
-    function errorCallback(err) {
-      console.log('The following gUM error occured: ' + err);
-    }
+    //Check if getUserMedia is supported
+    if (navigator.getUserMedia) {
+      console.log('getUserMedia supported.');
 
-    // If not supported
-  } else {
-    console.log('getUserMedia not supported on your browser!');
-  }
+      //If supported
+      navigator.getUserMedia ({audio: true}, streamCallback, errorCallback)
 
+      // Success callback
+      function streamCallback(stream) {
+        //Set up audio streams
 
-  //Set up catch for past canvas
-  const container = document.getElementById('containers')
-  let canvasCount = 1;
-
-  function copyCanvas() {
-    var temp = document.createElement("canvas");
-    temp.setAttribute("id", "dest" + canvasCount);
-    container.appendChild(temp);
-
-    let dest = document.getElementById("dest" + canvasCount);
-    let destCtx = dest.getContext('2d');
-    dest.setAttribute('width',intendedWidth);
-    dest.setAttribute('height',HEIGHT);
-    destCtx.clearRect(0, 0, WIDTH, HEIGHT);
-    destCtx.drawImage(canvas, 0, 0);
-    canvasCount++
-  }
-
-  //Set up animation loop
-  function loop() {
-
-    //Set up buffer array for input data
-    analyser.fftSize = 1024;
-    let bufferLength = analyser.frequencyBinCount;
-    let dataArray = new Uint8Array(bufferLength);
+        //define audio stream
+        microphone = audioCtx.createMediaStreamSource(stream);
 
 
+        //Pipe 1
 
-    for (var i = 1; i < divided_beats; i++) {
-      canvasCtx.fillRect(spaced_bars * i, bar_y, b_width, HEIGHT)
-    }
-    //Set up iterator function
-    function iterator() {
+        //Pipe user input to audio analyser
+        microphone.connect(analyser);
 
-      if (count < end) {
+        //Pipe analyser to silencer
+        analyser.connect(silencer)
 
-        analyser.getByteTimeDomainData(dataArray);
+        //Pipe silencer to destination
+        silencer.connect(audioCtx.destination)
 
-        for (let i = 0; i < bufferLength; i++) {
-          canvasCtx.fillRect(count,dataArray[i],wave_pixel,wave_pixel)
-          count += canvas_slicer
+        //Pipe 2
 
+        //Pipe oscillator to gain node
+        oscillator.connect(gainNode)
 
-          for (var j = 1; j < divided_beats; j++) {
-            if (count > (spaced_bars * j) && count < (spaced_bars * j) + 90) {
-              sound = true
-              break
-            } else {
-              sound  = false
-            }
-          }
+        //Pipe gain to destination
+        gainNode.connect(audioCtx.destination);
 
-          if (sound) {
-            gainNode.gain.value = $scope.volume
-          } else {
-            gainNode.gain.value = 0
-          }
-        }
-        requestAnimationFrame(iterator);
-      } else {
-        copyCanvas()
-        if ($scope.bars > 1) {
-          canvasCtx.clearRect(0, 0, WIDTH, HEIGHT);
-          count = spaced_bars / 2
-          $scope.bars--
-          loop()
-        } else {
-          canvasCtx.clearRect(0, 0, WIDTH, HEIGHT);
-          count = spaced_bars / 2
-          $scope.bars = 2
-          canvasCount = 1;
-          //Some finishing function
-        }
+        //set gain and silencer
+        gainNode.gain.value = 0;
+        silencer.gain.value = 0;
+
+        //start oscillator set properties
+        oscillator.start(0);
+        oscillator.frequency.value = 440
       }
-    }
-    iterator()
-  }
 
+      // Error callback
+      function errorCallback(err) {
+        console.log('The following gUM error occured: ' + err);
+      }
 
-  // Set up function for sample sound data
-  //Create function
-  function sample() {
-
-    //Set up buffer array for input data
-    analyser.fftSize = 1024;
-    let bufferLength = analyser.fftSize;
-    let dataArray = new Uint8Array(bufferLength);
-
-    let count = 0
-
-    //Set up sample size
-    let sampleSize = 25
-
-    for (var i = 1; i < divided_beats; i++) {
-      canvasCtx.fillRect(spaced_bars * i, bar_y, b_width, HEIGHT)
+      // If not supported
+    } else {
+      console.log('getUserMedia not supported on your browser!');
     }
 
 
-    //Make iterator function
-    function iterator() {
+    //Set up catch for past canvas
+    const container = document.getElementById('containers')
+    let canvasCount = 1;
 
-      if (count < WIDTH) {
+    function copyCanvas() {
+      var temp = document.createElement("canvas");
+      temp.setAttribute("id", "dest" + canvasCount);
+      container.appendChild(temp);
 
-        analyser.getByteTimeDomainData(dataArray);
+      let dest = document.getElementById("dest" + canvasCount);
+      let destCtx = dest.getContext('2d');
+      dest.setAttribute('width',intendedWidth / 2);
+      dest.setAttribute('height',HEIGHT / 2);
+      destCtx.clearRect(0, 0, WIDTH, HEIGHT);
+      destCtx.drawImage(canvas, 0, 0,WIDTH / 2, HEIGHT / 2);
+      canvasCount++
+    }
 
-        for (let i = 0; i < bufferLength; i++) {
 
-          //Test user input against bars
-          for (var j = 1; j < divided_beats; j++) {
-            // if ((count > (spaced_bars * j) - sampleSize) && count < (spaced_bars * j) + sampleSize) {
+    //Set up animation loop
+    function loop() {
+
+      let lag = 10;
+      let diff = 20;
+      let influence = 0;
+      let direction = 'both'
+      let meanArray = [];
+      let mean = HEIGHT / 2
+      let savedPlot;
+      let first = true
+      let meanLength = 1000
+      let peakArray = []
+      //Set up buffer array for input data
+      analyser.fftSize = 1024;
+      let bufferLength = analyser.frequencyBinCount;
+      let dataArray = new Uint8Array(bufferLength);
+
+
+
+      for (var i = 1; i < divided_beats; i++) {
+        canvasCtx.fillRect(spaced_bars * i, bar_y, b_width, HEIGHT)
+      }
+      //Set up iterator function
+      function iterator() {
+
+        if (count < end) {
+
+          analyser.getByteTimeDomainData(dataArray);
+
+          for (let i = 1; i < bufferLength; i++) {
+
+
+            //Only let one peak be drawn per bar
+
+            let lastQualifyingPoint = 0;
+            //Peak analyser
+            //Signal when plot point goes above mean + diff
+            if (dataArray[i] < mean - diff) {
+
+              if (dataArray[i] > lastQualifyingPoint) {
+
+                canvasCtx.fillStyle = 'blue';
+                canvasCtx.fillRect(lastQualifyingPoint,0,1,HEIGHT)
+                canvasCtx.fillStyle = 'black';
+              } else {
+                lastQualifyingPoint = count
+                canvasCtx.fillRect(count,dataArray[i],1,1)
+              }
+
+
+            } else {
+              if (dataArray[i] < HEIGHT / 2) {
+                meanArray.unshift(dataArray[i])
+
+                canvasCtx.fillStyle = 'red';
+                canvasCtx.fillRect(count,mean,1,1)
+
+                canvasCtx.fillStyle = 'black';
+              }
+
+              if (meanArray.length > meanLength) {
+                meanArray.pop()
+              }
+
+              let meanSum = 0;
+
+              for (var j = 0; j < meanArray.length; j++) {
+                meanSum += meanArray[j]
+              }
+
+              mean = meanSum / meanArray.length
+            }
+
+            //Boring stuff
+
+
             canvasCtx.fillRect(count,dataArray[i],wave_pixel,wave_pixel)
-            // }
-          }
+            count += canvas_slicer
 
-          for (var j = 1; j < divided_beats; j++) {
-            if (count > (spaced_bars * j) && count < (spaced_bars * j) + 90) {
-              sound = true
-              break
+
+            for (var j = 1; j < divided_beats; j++) {
+              if (count > (spaced_bars * j) && count < (spaced_bars * j) + 90) {
+                sound = true
+                break
+              } else {
+                sound  = false
+              }
+            }
+
+            if (sound) {
+              gainNode.gain.value = $scope.volume
             } else {
-              sound  = false
+              gainNode.gain.value = 0
+            }
+          }
+          requestAnimationFrame(iterator);
+        } else {
+          copyCanvas()
+          if ($scope.bars > 1) {
+            canvasCtx.clearRect(0, 0, WIDTH, HEIGHT);
+            count = spaced_bars / 2
+            $scope.bars--
+            loop()
+          } else {
+            canvasCtx.clearRect(0, 0, WIDTH, HEIGHT);
+            count = spaced_bars / 2
+            $scope.bars = 2
+            canvasCount = 1;
+            //Some finishing function
+          }
+        }
+      }
+      iterator()
+    }
+
+    function countOff() {
+
+      let countDown = beats
+      let countPrev = false
+      //Set up buffer array for input data
+      analyser.fftSize = 1024;
+      let bufferLength = analyser.frequencyBinCount;
+      let dataArray = new Uint8Array(bufferLength);
+
+      for (var i = 1; i < divided_beats; i++) {
+        canvasCtx.fillRect(spaced_bars * i, bar_y, b_width, HEIGHT)
+      }
+      //Set up iterator function
+      function iterator() {
+
+        if (count < end) {
+
+          analyser.getByteTimeDomainData(dataArray);
+
+          for (let i = 0; i < bufferLength; i++) {
+            count += canvas_slicer
+
+            for (var j = 1; j < divided_beats; j++) {
+              if (count > (spaced_bars * j) && count < (spaced_bars * j) + 90) {
+                sound = true
+                break
+              } else {
+                sound  = false
+              }
+            }
+
+            if (sound) {
+              gainNode.gain.value = $scope.volume
+            } else {
+              gainNode.gain.value = 0
             }
           }
 
-          if (sound) {
-            gainNode.gain.value = $scope.volume
-          } else {
-            gainNode.gain.value = 0
+
+          if (countPrev === false && sound === true) {
+            myBtn.innerHTML = countDown
+            countDown--
           }
+          countPrev = sound
 
-          count += canvas_slicer
+          requestAnimationFrame(iterator);
+        } else {
+          myBtn.innerHTML = 'START'
+          count = spaced_bars / 2;
+          loop()
         }
-
-
-        requestAnimationFrame(iterator)
-
-
-      } else {
-        console.log(sampleArray);
       }
-
+      iterator()
     }
-    iterator()
-
-  }
-
-  //Get cpu cycles
-  function getSpeed() {
-
-  }
-
-  function countOff() {
-
-    let countDown = beats
-    let countPrev = false
-    //Set up buffer array for input data
-    analyser.fftSize = 1024;
-    let bufferLength = analyser.frequencyBinCount;
-    let dataArray = new Uint8Array(bufferLength);
-
-    for (var i = 1; i < divided_beats; i++) {
-      canvasCtx.fillRect(spaced_bars * i, bar_y, b_width, HEIGHT)
-    }
-    //Set up iterator function
-    function iterator() {
-
-      if (count < end) {
-
-        analyser.getByteTimeDomainData(dataArray);
-
-        for (let i = 0; i < bufferLength; i++) {
-          count += canvas_slicer
-
-          for (var j = 1; j < divided_beats; j++) {
-            if (count > (spaced_bars * j) && count < (spaced_bars * j) + 90) {
-              sound = true
-              break
-            } else {
-              sound  = false
-            }
-          }
-
-          if (sound) {
-            gainNode.gain.value = $scope.volume
-          } else {
-            gainNode.gain.value = 0
-          }
-        }
 
 
-        if (countPrev === false && sound === true) {
-          myBtn.innerHTML = countDown
-          countDown--
-        }
-        countPrev = sound
+    var myBtn = document.getElementById('start');
 
-        requestAnimationFrame(iterator);
-      } else {
-        myBtn.innerHTML = 'START'
-        count = spaced_bars / 2;
-        loop()
-      }
-    }
-    iterator()
-  }
-
-
-  var myBtn = document.getElementById('start');
-
-  //add event listener
-  myBtn.addEventListener('click', function(event) {
-    container.innerHTML = '';
-    countOff()
-  });
+    //add event listener
+    myBtn.addEventListener('click', function(event) {
+      container.innerHTML = '';
+      countOff()
+    });
 
 
 
