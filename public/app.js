@@ -134,7 +134,11 @@ angular.module('paradiddle', [])
     $scope.bars = 2;
     $scope.volume = 0.1;
     $scope.beats = 6;
-    $scope.tempo = 0.01
+    $scope.tempo = 0.01;
+    $scope.offset = 27;
+    $scope.noiseThreshold = 40
+    $scope.waveLength = 10
+    $scope.toggleWaveForm = false;
 
     function initialization() {
 
@@ -147,12 +151,12 @@ angular.module('paradiddle', [])
       let sound = false;
       let count = spaced_bars / 2
       let end = WIDTH - spaced_bars / 2
-      let waveWindow = 12
+      let waveWindow = $scope.waveLength;
       let plotsArray = [];
       let accuracy = 0;
 
 
-      let diff = 40;
+      let diff = $scope.noiseThreshold;
       let meanArray = [];
       let meanLength = 40
       let mean = HEIGHT / 2
@@ -189,21 +193,20 @@ angular.module('paradiddle', [])
                 plotsArray.push(count)
 
               } else {
-                if (plotsArray[plotsArray.length - 1] + waveWindow < WIDTH) {
                   if (count > plotsArray[plotsArray.length - 1] + waveWindow) {
                     canvasCtx.fillStyle = '#749C75';
-                    canvasCtx.fillRect(plotsArray[0],0,1,HEIGHT)
+                    canvasCtx.fillRect(plotsArray[0] - $scope.offset,0,1,HEIGHT)
                     canvasCtx.fillStyle = '#44292A';
                     plotsArray = [];
                   }
-                  plotsArray = [];
-                }
 
                 if (dataArray[i] < HEIGHT / 2) {
                   meanArray.unshift(dataArray[i])
 
                   canvasCtx.fillStyle = 'purple';
-                  // canvasCtx.fillRect(count,mean,1,1)
+                  if ($scope.toggleWaveForm) {
+                    canvasCtx.fillRect(count - $scope.offset,mean,1,1)
+                  }
 
                   canvasCtx.fillStyle = '#44292A';
                 }
@@ -221,8 +224,9 @@ angular.module('paradiddle', [])
                 mean = meanSum / meanArray.length
               }
 
-
-              // canvasCtx.fillRect(count,dataArray[i],wave_pixel,wave_pixel)
+              if ($scope.toggleWaveForm) {
+                canvasCtx.fillRect(count - $scope.offset,dataArray[i],wave_pixel,wave_pixel)
+              }
               count += canvas_slicer
 
 
