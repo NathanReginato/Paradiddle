@@ -1,6 +1,17 @@
 //Set up consts
 
-angular.module('paradiddle', [])
+angular.module('paradiddle', ["chart.js"])
+.config(['ChartJsProvider', function (ChartJsProvider) {
+  // Configure all charts
+  ChartJsProvider.setOptions({
+    colours: ['#749C75','#44292A','#F4F6EF'],
+    responsive: true
+  });
+  // Configure all line charts
+  ChartJsProvider.setOptions('Line', {
+    datasetFill: false
+  });
+}])
 .controller('main', function($scope) {
   //Get audio context
   const AudioContext = window.AudioContext || window.webkitAudioContext;
@@ -131,12 +142,12 @@ angular.module('paradiddle', [])
     }
 
     //Set up view varibales
-    $scope.bars = 4;
+    $scope.bars = 2;
     $scope.volume = 0.1;
-    $scope.beats = 4;
+    $scope.beats = 3;
     $scope.tempo = 0.01;
     $scope.offset = 27;
-    $scope.noiseThreshold = 40
+    $scope.noiseThreshold = 20
     $scope.waveLength = 10
     $scope.toggleWaveForm = true;
 
@@ -197,12 +208,12 @@ angular.module('paradiddle', [])
                 plotsArray.push(count)
 
               } else {
-                  if (count > plotsArray[plotsArray.length - 1] + waveWindow) {
-                    canvasCtx.fillStyle = '#749C75';
-                    tempCount.push(count - $scope.offset)
-                    canvasCtx.fillRect(plotsArray[0] - $scope.offset,0,1,HEIGHT)
-                    plotsArray = [];
-                  }
+                if (count > plotsArray[plotsArray.length - 1] + waveWindow) {
+                  canvasCtx.fillStyle = '#749C75';
+                  tempCount.push(plotsArray[0] - $scope.offset)
+                  canvasCtx.fillRect(plotsArray[0] - $scope.offset,0,1,HEIGHT)
+                  plotsArray = [];
+                }
 
                 if (dataArray[i] < HEIGHT / 2) {
                   meanArray.unshift(dataArray[i])
@@ -272,20 +283,31 @@ angular.module('paradiddle', [])
         iterator()
       }
 
+      let accuracyArr = []
+      let zeros = []
+      let chartLabels = []
+
       function calculate() {
 
-        let accuracyArr = []
 
         for (var i = 0; i < countArray.length; i++) {
           for (var j = 0; j < countArray[i].length; j++) {
             accuracyArr.push(countArray[i][j] - (spaced_bars * (j + 1)))
+            zeros.push(0)
+            chartLabels.push(`${i+1}.${j+1}`)
           }
         }
 
-        console.log(accuracyArr);
+        console.log(chartLabels);
+
+        $scope.labels = chartLabels;
+        $scope.data = [
+          accuracyArr,
+          zeros
+        ];
+        $scope.$apply()
 
       }
-
       function countOff() {
 
         let countDown = $scope.beats
@@ -344,13 +366,44 @@ angular.module('paradiddle', [])
     }
 
 
-
     var myBtn = document.getElementById('start');
+
 
     //add event listener
     myBtn.addEventListener('click', function(event) {
       container.innerHTML = '';
       initialization()
     });
+
+
+
+    $scope.series = ['Your time', 'Perfect time'];
+    $scope.data = [
+      [],
+      []
+    ];
+    $scope.onClick = function (points, evt) {
+      console.log(points, evt);
+    };
+    $scope.datasetOverride = [{ yAxisID: 'y-axis-1' }, { yAxisID: 'y-axis-2' }];
+    $scope.options = {
+      scales: {
+        yAxes: [
+          {
+            id: 'y-axis-1',
+            type: 'linear',
+            display: true,
+            position: 'left'
+          },
+          {
+            id: 'y-axis-1',
+            type: 'linear',
+            display: true,
+            position: 'left'
+          }
+        ]
+      }
+    };
+
 
   })
