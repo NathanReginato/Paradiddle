@@ -131,14 +131,14 @@ angular.module('paradiddle', [])
     }
 
     //Set up view varibales
-    $scope.bars = 2;
+    $scope.bars = 4;
     $scope.volume = 0.1;
-    $scope.beats = 6;
+    $scope.beats = 4;
     $scope.tempo = 0.01;
     $scope.offset = 27;
     $scope.noiseThreshold = 40
     $scope.waveLength = 10
-    $scope.toggleWaveForm = false;
+    $scope.toggleWaveForm = true;
 
     function initialization() {
 
@@ -153,6 +153,8 @@ angular.module('paradiddle', [])
       let end = WIDTH - spaced_bars / 2
       let waveWindow = $scope.waveLength;
       let plotsArray = [];
+      let tempCount = []
+      let countArray = [];
       let accuracy = 0;
 
 
@@ -179,8 +181,10 @@ angular.module('paradiddle', [])
           canvasCtx.fillStyle = '#44292A';
           canvasCtx.fillRect(spaced_bars * i, bar_y, b_width, HEIGHT)
         }
+
         //Set up iterator function
         function iterator() {
+
 
           if (count < end) {
 
@@ -195,20 +199,20 @@ angular.module('paradiddle', [])
               } else {
                   if (count > plotsArray[plotsArray.length - 1] + waveWindow) {
                     canvasCtx.fillStyle = '#749C75';
+                    tempCount.push(count - $scope.offset)
                     canvasCtx.fillRect(plotsArray[0] - $scope.offset,0,1,HEIGHT)
-                    canvasCtx.fillStyle = '#44292A';
                     plotsArray = [];
                   }
 
                 if (dataArray[i] < HEIGHT / 2) {
                   meanArray.unshift(dataArray[i])
 
-                  canvasCtx.fillStyle = 'purple';
                   if ($scope.toggleWaveForm) {
+                    canvasCtx.fillStyle = 'purple';
                     canvasCtx.fillRect(count - $scope.offset,mean,1,1)
+                    canvasCtx.fillStyle = '#44292A';
                   }
 
-                  canvasCtx.fillStyle = '#44292A';
                 }
 
                 if (meanArray.length > meanLength) {
@@ -245,10 +249,11 @@ angular.module('paradiddle', [])
                 gainNode.gain.value = 0
               }
             }
-
             requestAnimationFrame(iterator);
           } else {
             copyCanvas()
+            countArray.push(tempCount)
+            tempCount = []
             if ($scope.bars > 1) {
               canvasCtx.clearRect(0, 0, WIDTH, HEIGHT);
               count = spaced_bars / 2
@@ -257,13 +262,28 @@ angular.module('paradiddle', [])
             } else {
               canvasCtx.clearRect(0, 0, WIDTH, HEIGHT);
               count = spaced_bars / 2
-              $scope.bars = 2
+              $scope.bars = 4
               canvasCount = 1;
-              //Some finishing function
+              calculate()
             }
           }
         }
+
         iterator()
+      }
+
+      function calculate() {
+
+        let accuracyArr = []
+
+        for (var i = 0; i < countArray.length; i++) {
+          for (var j = 0; j < countArray[i].length; j++) {
+            accuracyArr.push(countArray[i][j] - (spaced_bars * (j + 1)))
+          }
+        }
+
+        console.log(accuracyArr);
+
       }
 
       function countOff() {
@@ -323,6 +343,8 @@ angular.module('paradiddle', [])
       }
     }
 
+
+
     var myBtn = document.getElementById('start');
 
     //add event listener
@@ -330,7 +352,5 @@ angular.module('paradiddle', [])
       container.innerHTML = '';
       initialization()
     });
-
-
 
   })
