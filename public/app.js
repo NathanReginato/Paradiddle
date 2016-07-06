@@ -142,7 +142,7 @@ angular.module('paradiddle', ["chart.js"])
     }
 
     //Set up view varibales
-    $scope.bars = 2;
+    $scope.bars = 1;
     $scope.volume = 0.1;
     $scope.beats = 3;
     $scope.tempo = 0.01;
@@ -155,6 +155,7 @@ angular.module('paradiddle', ["chart.js"])
 
       let divided_beats = $scope.beats + 1
       let spaced_bars = WIDTH / divided_beats
+      let difference = (spaced_bars * 2) - (spaced_bars * 1)
       let wave_pixel = 1
       let canvas_slicer = $scope.tempo
       let bar_y = 0;
@@ -244,7 +245,6 @@ angular.module('paradiddle', ["chart.js"])
               }
               count += canvas_slicer
 
-
               for (var j = 1; j < divided_beats; j++) {
                 if (count > (spaced_bars * j) && count < (spaced_bars * j) + spaced_bars / 2) {
                   sound = true
@@ -291,12 +291,29 @@ angular.module('paradiddle', ["chart.js"])
 
 
         for (var i = 0; i < countArray.length; i++) {
-          for (var j = 0; j < countArray[i].length; j++) {
-            accuracyArr.push(countArray[i][j] - (spaced_bars * (j + 1)))
-            zeros.push(0)
-            chartLabels.push(`${i+1}.${j+1}`)
+          for (var j = 0; j < $scope.beats; j++) {
+            let half = difference / 2
+            let front = (difference * (j + 1)) - half
+            let back = (difference * (j + 1)) + half
+            if (countArray[i][j] > front && countArray[i][j] < back) {
+
+              accuracyArr.push(countArray[i][j] - (spaced_bars * (j + 1)))
+              zeros.push(0)
+              chartLabels.push(`${i+1}.${j+1}`)
+
+            } else {
+              accuracyArr.push(back)
+              zeros.push(0)
+
+            }
+
           }
         }
+
+
+
+
+        console.log('accuracyArr', accuracyArr);
 
         console.log(chartLabels);
 
@@ -319,7 +336,7 @@ angular.module('paradiddle', ["chart.js"])
 
         for (var i = 1; i < divided_beats; i++) {
           canvasCtx.fillStyle = '#44292A';
-          canvasCtx.fillRect(spaced_bars * i, bar_y, b_width, HEIGHT)
+          // canvasCtx.fillRect(spaced_bars * i, bar_y, b_width, HEIGHT)
         }
         //Set up iterator function
         function iterator() {
@@ -403,7 +420,7 @@ angular.module('paradiddle', ["chart.js"])
           }
         ]
       }
-    };
 
+    };
 
   })
