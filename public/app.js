@@ -211,7 +211,8 @@ angular.module('paradiddle', ["chart.js"])
               } else {
                 if (count > plotsArray[plotsArray.length - 1] + waveWindow) {
                   canvasCtx.fillStyle = '#749C75';
-                  tempCount.push(plotsArray[0] - $scope.offset)
+
+                  tempCount.push(Math.round(plotsArray[0] - $scope.offset))
                   canvasCtx.fillRect(plotsArray[0] - $scope.offset,0,1,HEIGHT)
                   plotsArray = [];
                 }
@@ -264,6 +265,8 @@ angular.module('paradiddle', ["chart.js"])
           } else {
             copyCanvas()
             countArray.push(tempCount)
+
+            console.log(countArray);
             tempCount = []
             if ($scope.bars > 1) {
               canvasCtx.clearRect(0, 0, WIDTH, HEIGHT);
@@ -289,138 +292,173 @@ angular.module('paradiddle', ["chart.js"])
 
       function calculate() {
 
+        let half = difference / 2
 
-        for (var i = 0; i < countArray.length; i++) {
-          for (var j = 0; j < $scope.beats; j++) {
-            let half = difference / 2
-            let front = (difference * (j + 1)) - half
-            let back = (difference * (j + 1)) + half
-            if (countArray[i][j] > front && countArray[i][j] < back) {
+        let tempAccuracyArray = []
+        let tempAccuracyArray2 = []
 
-              accuracyArr.push(countArray[i][j] - (spaced_bars * (j + 1)))
-              zeros.push(0)
-              chartLabels.push(`${i+1}.${j+1}`)
 
-            } else {
-              accuracyArr.push(back)
-              zeros.push(0)
+        // countArray = array of arrays
+        // $scope.beats = number of beats per measure
+        // accuracyArr = array to be pushed into
+        // zeros.push('0')
+        // chartLabels.push(`${i+1}.${j+1}`)
 
-            }
+        // let front = (divided_beats * (j + 1)) - half
+        // let back = (divided_beats * (j + 1)) + half
 
-          }
+
+
+    function mungify(beatsForMeasures, beats, canvasSize) {
+      let upperLimitsForBeats = [canvasSize]
+      let spaces = canvasSize/(beats+1)
+      for (var i = 0; i < beats-1; i++) {
+        if (upperLimitsForBeats.length == 1) {
+          upperLimitsForBeats.unshift(upperLimitsForBeats[0]-1.5*spaces)
+        } else {
+          upperLimitsForBeats.unshift(upperLimitsForBeats[0]-spaces)
         }
-
-
-
-
-        console.log('accuracyArr', accuracyArr);
-
-        console.log(chartLabels);
-
-        $scope.labels = chartLabels;
-        $scope.data = [
-          accuracyArr,
-          zeros
-        ];
-        $scope.$apply()
-
       }
-      function countOff() {
 
-        let countDown = $scope.beats
-        let countPrev = false
-        //Set up buffer array for input data
-        analyser.fftSize = 1024;
-        let bufferLength = analyser.frequencyBinCount;
-        let dataArray = new Uint8Array(bufferLength);
-
-        for (var i = 1; i < divided_beats; i++) {
-          canvasCtx.fillStyle = '#44292A';
-          // canvasCtx.fillRect(spaced_bars * i, bar_y, b_width, HEIGHT)
+      function parseChartData(dataArray, beatsPerMeasure, width) {
+        for (var i = 0; i < array.length; i++) {
+          array[i]
         }
-        //Set up iterator function
-        function iterator() {
-
-          if (count < end) {
-
-            analyser.getByteTimeDomainData(dataArray);
-
-            for (let i = 0; i < bufferLength; i++) {
-              count += canvas_slicer
-
-              for (var j = 1; j < divided_beats; j++) {
-                if (count > (spaced_bars * j) && count < (spaced_bars * j) + spaced_bars / 2) {
-                  sound = true
-                  break
-                } else {
-                  sound  = false
-                }
-              }
-
-              if (sound) {
-                gainNode.gain.value = $scope.volume
-              } else {
-                gainNode.gain.value = 0
-              }
-            }
-
-
-            if (countPrev === false && sound === true) {
-              myBtn.innerHTML = countDown
-              countDown--
-            }
-            countPrev = sound
-
-            requestAnimationFrame(iterator);
-          } else {
-            myBtn.innerHTML = 'START'
-            count = spaced_bars / 2;
-            loop()
-          }
-        }
-        iterator()
       }
+
+
+      let daBeats = []
+      beatsForMeasures.forEach(function(beatsForMeasure, measureNum){
+        daBeats[measureNum] = []
+        beatsForMeasure.forEach(function(daBeat, beatIndex){
+          for (var i = 0; i <= upperLimitsForBeats.length; i++) {
+            if (daBeat < upperLimitsForBeats[i]) {
+              daBeats[measureNum][i] = daBeat
+              return
+            }
+          }
+        })
+
+        while (daBeats[measureNum].length < beats) {
+          daBeats[measureNum].push(null)
+        }
+
+      })
+      return daBeats
     }
 
-
-    var myBtn = document.getElementById('start');
-
-
-    //add event listener
-    myBtn.addEventListener('click', function(event) {
-      container.innerHTML = '';
-      initialization()
-    });
+    console.log("input: ", countArray);
+    console.log("output: ", mungify(countArray, $scope.beats, WIDTH))
 
 
 
-    $scope.series = ['Your time', 'Perfect time'];
-    $scope.data = [
-      [],
-      []
-    ];
-    $scope.onClick = function (points, evt) {
-      console.log(points, evt);
-    };
-    $scope.datasetOverride = [{ yAxisID: 'y-axis-1' }, { yAxisID: 'y-axis-2' }];
-    $scope.options = {
-      scales: {
-        yAxes: [
-          {
-            id: 'y-axis-1',
-            type: 'linear',
-            display: true,
-            position: 'left'
-          },
-          {
-            id: 'y-axis-1',
-            type: 'linear',
-            display: true,
-            position: 'left'
-          }
-        ]
+      console.log(tempAccuracyArray);
+
+      $scope.labels = chartLabels;
+      $scope.data = [
+        accuracyArr,
+        zeros
+      ];
+      $scope.$apply()
+
+    }
+
+    function countOff() {
+
+      let countDown = $scope.beats
+      let countPrev = false
+      //Set up buffer array for input data
+      analyser.fftSize = 1024;
+      let bufferLength = analyser.frequencyBinCount;
+      let dataArray = new Uint8Array(bufferLength);
+
+      for (var i = 1; i < divided_beats; i++) {
+        canvasCtx.fillStyle = '#44292A';
+        // canvasCtx.fillRect(spaced_bars * i, bar_y, b_width, HEIGHT)
       }
+      //Set up iterator function
+      function iterator() {
 
-    };
+        if (count < end) {
 
-  })
+          analyser.getByteTimeDomainData(dataArray);
+
+          for (let i = 0; i < bufferLength; i++) {
+            count += canvas_slicer
+
+            for (var j = 1; j < divided_beats; j++) {
+              if (count > (spaced_bars * j) && count < (spaced_bars * j) + spaced_bars / 2) {
+                sound = true
+                break
+              } else {
+                sound  = false
+              }
+            }
+
+            if (sound) {
+              gainNode.gain.value = $scope.volume
+            } else {
+              gainNode.gain.value = 0
+            }
+          }
+
+
+          if (countPrev === false && sound === true) {
+            myBtn.innerHTML = countDown
+            countDown--
+          }
+          countPrev = sound
+
+          requestAnimationFrame(iterator);
+        } else {
+          myBtn.innerHTML = 'START'
+          count = spaced_bars / 2;
+          loop()
+        }
+      }
+      iterator()
+    }
+  }
+
+
+  var myBtn = document.getElementById('start');
+
+
+  //add event listener
+  myBtn.addEventListener('click', function(event) {
+    container.innerHTML = '';
+    initialization()
+  });
+
+
+
+  $scope.series = ['Your time', 'Perfect time'];
+  $scope.data = [
+    [],
+    []
+  ];
+  $scope.onClick = function (points, evt) {
+    console.log(points, evt);
+  };
+  $scope.datasetOverride = [{ yAxisID: 'y-axis-1' }, { yAxisID: 'y-axis-2' }];
+  $scope.options = {
+    scales: {
+      yAxes: [
+        {
+          id: 'y-axis-1',
+          type: 'linear',
+          display: true,
+          position: 'left'
+        },
+        {
+          id: 'y-axis-1',
+          type: 'linear',
+          display: true,
+          position: 'left'
+        }
+      ]
+    }
+
+  };
+
+})
