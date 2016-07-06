@@ -367,6 +367,9 @@ angular.module('paradiddle', ["chart.js"])
             if (count >= $scope.beats) {
               count = 0;
             }
+
+            zeros.push('0')
+            chartLabels.push(`${i+1}`)
           }
           return tempArray
         }
