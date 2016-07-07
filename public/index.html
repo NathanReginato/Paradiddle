@@ -17,10 +17,13 @@
     <nav>
       <h2>Paradiddle</h2>
     </nav>
+    <div id="stop" class="stop_button" ng-hide="startShow">
+      <span>STOP</span>
+    </div>
   </header>
   <main>
     <canvas id="canvas" width="1000" height="255"></canvas>
-    <div class="start">
+    <div class="start" ng-show="startShow">
       <a id="start">START</a>
     </div>
 

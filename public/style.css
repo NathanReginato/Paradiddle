@@ -255,3 +255,18 @@ input[type=checkbox]:checked + label:before {
   width: 100%;
   padding: 50px;
 }
+
+.stop_button {
+  position: absolute;
+  top: 0;
+  right: 0;
+  background: red;
+  padding: 10px;
+  margin: 15px;
+  width: auto;
+  font-weight: bold;
+  color: #F4F6EF;
+  background: #749C75;
+  border-radius: 5px;
+  font-family: 'Open Sans', sans-serif;
+}

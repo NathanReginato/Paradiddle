@@ -64,6 +64,8 @@ angular.module('paradiddle', ["chart.js"])
     //Set up audio input
 
     $scope.showit = false
+    $scope.startShow = true
+    $scope.running = true
     //Settings
     $scope.showsettings = function() {
       $scope.showit = !$scope.showit
@@ -183,6 +185,8 @@ angular.module('paradiddle', ["chart.js"])
 
 
 
+
+
         analyser.fftSize = 1024;
         let bufferLength = analyser.frequencyBinCount;
         let dataArray = new Uint8Array(bufferLength);
@@ -261,7 +265,7 @@ angular.module('paradiddle', ["chart.js"])
                 gainNode.gain.value = 0
               }
             }
-            requestAnimationFrame(iterator);
+
           } else {
             copyCanvas()
             countArray.push(tempCount)
@@ -272,7 +276,7 @@ angular.module('paradiddle', ["chart.js"])
               canvasCtx.clearRect(0, 0, WIDTH, HEIGHT);
               count = spaced_bars / 2
               $scope.bars--
-              loop()
+                loop()
             } else {
               canvasCtx.clearRect(0, 0, WIDTH, HEIGHT);
               count = spaced_bars / 2
@@ -282,7 +286,6 @@ angular.module('paradiddle', ["chart.js"])
             }
           }
         }
-
         iterator()
       }
 
@@ -383,6 +386,8 @@ angular.module('paradiddle', ["chart.js"])
         console.log(accuracyArr);
 
         $scope.labels = chartLabels;
+        $scope.startShow = true
+        $scope.$apply()
         $scope.data = [
           accuracyArr,
           zeros
@@ -441,6 +446,9 @@ angular.module('paradiddle', ["chart.js"])
           } else {
             myBtn.innerHTML = 'START'
             count = spaced_bars / 2;
+            $scope.startShow = false
+            console.log($scope.startShow);
+            $scope.$apply()
             loop()
           }
         }
@@ -450,12 +458,19 @@ angular.module('paradiddle', ["chart.js"])
 
 
     var myBtn = document.getElementById('start');
+    var stopBtn = document.getElementById('stop');
 
 
     //add event listener
     myBtn.addEventListener('click', function(event) {
       container.innerHTML = '';
       initialization()
+    });
+
+    stopBtn.addEventListener('click', function(event) {
+      console.log('yay');
+      $scope.running = false
+      // $scope.$apply()
     });
 
 
